@@ -1,0 +1,222 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+        }
+
+        #container {
+            border: solid 2px skyblue;
+            position: relative;
+            margin: 100px auto;
+        }
+
+        #XXX{
+            border: solid 2px skyblue;
+            position: relative;
+            margin: 100px auto;
+        }
+
+        canvas {
+            display: block;
+
+        }
+
+        .color-setting {
+            position: absolute;
+            left: 5px;
+            bottom: 0;
+            width: 80px;
+        }
+
+        .color-setting div {
+            width: 30px;
+            height: 20px;
+            margin-bottom: 10px;
+            transition: width 0.5s;
+        }
+
+        .width-setting{
+            position: absolute;
+            right: 5px;
+            bottom: 0;
+            width: 40px;
+        }
+
+        .width-setting div {
+            width: 30px;
+            height: 20px;
+            margin-bottom: 10px;
+            transition: width 0.5s;
+            text-align: center;
+            color: white;
+        }
+
+    </style>
+</head>
+<body>
+<div id="container">
+    <canvas ></canvas>
+
+    <div class="color-setting"></div>
+
+    <div class="width-setting"></div>
+</div>
+
+
+<div id="XXX">
+    <canvas ></canvas>
+
+    <div class="color-setting"></div>
+
+    <div class="width-setting"></div>
+</div>
+
+<script type="text/javascript">
+
+    //封装画板函数
+    function Draw(selector,options) {
+        var app =document.querySelector(selector);
+        var draw =app.querySelector('canvas');
+        var pen =draw.getContext('2d');
+        var itemHome =app.querySelector('.color-setting');
+        var itemHome2 =app.querySelector('.width-setting');
+        var isDown = false;
+
+        var colors = options&&options.colors ? options.colors:['yellowgreen','hotpink','cyan'];
+        var widths = options&&options.widths ? options.widths:[];
+
+        draw.width = options&&options.width ? options.width:800;
+        draw.height =options&&options.height ? options.height:500;
+        app.style.width= draw.width + 'px';
+        app.style.height=draw.height + 'px';
+
+
+        pen.lineWidth=3;
+        pen.strokeStyle='hotpink';
+
+        //鼠标按下事件
+        draw.onmousedown=function (e) {
+            isDown=true;
+            pen.beginPath();
+            pen.moveTo(e.offsetX,e.offsetY);
+
+        };
+        //鼠标移动事件
+        draw.onmousemove=function (e) {
+            if(!isDown) return;
+            pen.lineTo(e.offsetX,e.offsetY);
+            pen.stroke();
+
+        };
+        //鼠标抬起事件
+        draw.onmouseup=function () {
+            isDown=false;
+        };
+
+
+
+        //动态创建颜色和宽度按钮
+        app. creatColorAndWidth=function(){
+
+             for(i=0;i<colors.length;i++){
+                 var item = document.createElement('div');
+                 item.classList.add('item');
+                 item.style.backgroundColor = colors[i];
+                 itemHome.appendChild(item);
+
+             }
+
+            for(i=0;i<widths.length;i++){
+                var item = document.createElement('div');
+
+                item.classList.add('item');
+
+                item.innerHTML=widths[i];
+
+                var itemSize =item.innerHTML;
+
+                item.setAttribute('line',itemSize);
+
+                item.style.backgroundColor ='hotpink';
+                itemHome2.appendChild(item);
+
+            }
+        };
+
+        app.creatColorAndWidth();
+
+
+        //颜色区域控制画笔颜色
+        itemHome.onclick=function (e) {
+            if(e.target.classList.contains('item')){
+                window.color = getComputedStyle(e.target).backgroundColor;
+                pen.strokeStyle = window.color;
+
+
+                //------------颜色和宽度相互切换-----------------------------
+                var oos = itemHome2.querySelectorAll('div');
+                for(j=0;j<oos.length;j++){
+                    if(oos[j].style.borderRadius=='50%'){
+                        oos[j].style.backgroundColor=window.color;
+                    }
+                }
+                //----------------------------------------------------
+
+                for(i=0;i<colors.length;i++){
+                    var item = itemHome.querySelectorAll('.item');
+                    item[i].style.width='30px';
+                }
+
+                e.target.style.width='50px';
+            }
+        };
+
+        //宽度区域控制画笔宽度
+        itemHome2.onclick=function (e) {
+
+            if(e.target.classList.contains('item')){
+
+                var lineSize=e.target.getAttribute('line');
+
+                pen.lineWidth=lineSize;
+
+                for(i=0;i<widths.length;i++){
+                    var item = itemHome2.querySelectorAll('.item');
+                    item[i].style.width='30px';
+                    item[i].style.borderRadius='0';
+                    item[i].style.backgroundColor='hotpink';
+                }
+                e.target.style.width='35px';
+                e.target.style.borderRadius='50%';
+                e.target.style.backgroundColor=window.color;
+
+            }
+        }
+    }
+
+
+    //构造画板实例化对象
+    new Draw('#container',{
+        width:700,
+        height:600,
+        colors:['skyblue','black','yellow','red','green'],
+        widths:[1,4,5,6,3,2,50]
+    });
+
+    new Draw('#XXX',{
+        width:300,
+        height:200,
+        colors:['black','yellow','red','green'],
+        widths:[1,4,5,6,50]
+    })
+</script>
+</body>
+</html>
